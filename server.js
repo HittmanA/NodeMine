@@ -8,6 +8,9 @@ var gfs = require("./nmps/Utils/GetFileSync.js");
 var io = require("./nmps/Console/IO.js");
 var Io = new io();
 var events = require("./nmps/Events/EventEmitter.js");
+var chunk = require("./nmps/Chunk/GenerateChunk.js");
+
+var newChunk = chunk.generateChunk(0,0);
 
 logger.info("Starting NMPS...");
 
@@ -135,7 +138,7 @@ server.on('connection', function(client) {
           chunkX: x,
           chunkZ: z,
           order: 1,
-          chunkData:fs.readFileSync(__dirname+"/chunk")
+          chunkData: newChunk
         }}]);
       }
     }
