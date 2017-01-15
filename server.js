@@ -129,7 +129,7 @@ server.on('connection', function(client) {
 
   client.on("chunk_radius_update",() => {
     client.writeMCPE('chunk_radius_update',{
-      chunk_radius:20
+      chunk_radius:1
     });
 
     for (let x = -1; x <=1; x++) {

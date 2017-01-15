@@ -1,6 +1,6 @@
 module.exports = {
   generateChunk: function(x,z) {
-    var Chunk = require("prismarine-chunk")("1.0");
+    var Chunk = require("prismarine-chunk")("pe_1.0");
     var Vec3 = require("vec3");
 
     var chunk=new Chunk();
