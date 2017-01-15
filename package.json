@@ -1,0 +1,14 @@
+{
+  "name": "nodemine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "HittmanA",
+  "license": "ISC",
+  "dependencies": {
+    "jwt-simple": "^0.5.1"
+  }
+}
