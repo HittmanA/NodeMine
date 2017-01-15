@@ -24,8 +24,9 @@ module.exports = {
     console.log("[" + timestamp.getTimestamp() + "][CRITICAL] " + message);
   },
 
-  error: function(message) {
+  error: function(error, info) {
     var timestamp = require("../Time/Time.js");
-    console.log("[" + timestamp.getTimestamp() + "][ERROR] " + message);
+    var errorMessage = require("../Error/ErrorManager");
+    console.log("[" + timestamp.getTimestamp() + "][ERROR] " + errorMessage.getMessageFromError(error, info));
   }
 }

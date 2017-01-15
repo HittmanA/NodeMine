@@ -1,0 +1,12 @@
+{
+  "info" : {
+    "help" : "Usage: /info",
+    "role" : "Returns info about the server.",
+    "return" : "#ROOT#"
+  },
+  "help" : {
+    "help" : "Usage: /help",
+    "role" : "Returns a list of commands and how to use them",
+    "return" : "#ROOT#"
+  }
+}

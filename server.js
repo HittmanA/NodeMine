@@ -9,6 +9,10 @@ var io = require("./nmps/Console/IO.js");
 var Io = new io();
 var events = require("./nmps/Events/EventEmitter.js");
 var chunk = require("./nmps/Chunk/GenerateChunk.js");
+var commandParser = require("./nmps/Command/CommandParser.js");
+var commandManager = require("./nmps/Command/commandManager.js");
+commandManager = new commandManager();
+commandParser = new commandParser();
 
 var newChunk = chunk.generateChunk(0,0);
 
@@ -30,10 +34,6 @@ var server = pmp.createServer({
 });
 
 logger.info("Server online at "+config.Host+":"+config.Port);
-
-events.on("CONSOLE_INPUT", function(input) {
-  console.log(input,true);
-});
 
 server.on('connection', function(client) {
 
