@@ -142,7 +142,7 @@ server.on('connection', function(client) {
         }}]);
       }
     }
-//t
+    
     client.writeMCPE('player_status', {
       status: 3
     });
