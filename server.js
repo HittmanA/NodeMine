@@ -127,9 +127,9 @@ server.on('connection', function(client) {
     });
   });
 
-  client.on("chunk_radius_update",() => {
+  client.on("request_chunk_radius",(radius) => {
     client.writeMCPE('chunk_radius_update',{
-      chunk_radius:1
+      chunk_radius:radius
     });
 
     for (let x = -1; x <=1; x++) {
@@ -142,7 +142,7 @@ server.on('connection', function(client) {
         }}]);
       }
     }
-    
+
     client.writeMCPE('player_status', {
       status: 3
     });
