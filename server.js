@@ -14,7 +14,7 @@ var commandManager = require("./nmps/Command/commandManager.js");
 commandManager = new commandManager();
 commandParser = new commandParser();
 
-var newChunk = chunk.generateChunk(0,0);
+var newChunk = chunk.generateChunk();
 
 logger.info("Starting NMPS...");
 
@@ -65,19 +65,12 @@ server.on('connection', function(client) {
         });
     }
 
-    client.writeMCPE('move_player', {
-      entityId: [0,0],
-      x: 1,
-      y: 64 + 1.62,
-      z: 1,
-      yaw: 0,
-      headYaw: 0,
-      pitch: 0,
-      mode: 0,
-      onGround: 1
-    });
-
-    client.writeMCPE('start_game', {
+    client.writeMCPE('resource_packs_info', {
+            mustAccept: false,
+            behahaviorpackinfos: 0,
+            resourcepackinfos: 0
+        });
+        client.writeMCPE('start_game', {
             entity_id: [0, 0],
             runtime_entity_id: [0, 0],
             x: 0, y: 5 + 1.62, z: 0,
@@ -107,59 +100,46 @@ server.on('connection', function(client) {
             enable_commands: true,
             is_texturepacks_required: false,
             secret: '1m0AAMIFIgA=',
-            world_name: 'world'
+            world_name: 'temp_server'
         });
+        client.writeMCPE('set_time', {
+            time: 0,
+            started: true
+        });
+        client.writeMCPE('adventure_settings', {
+            flags: 0x040,
+            user_permission: 3
+        });
+        client.writeMCPE('player_status', {
+            status: 3
+        });
+        client.on('request_chunk_radius', (packet) => {
+          console.log(packet);
+          client.writeMCPE('chunk_radius_update', {
+              chunk_radius: 22
+          });
+          return;
 
-    client.writeMCPE('set_spawn_position', {
-      x: 1,
-      y: 64,
-      z: 1
-    });
-    client.writeMCPE("set_time",{
-      time:0,
-      started:1
-    });
+          for (let x = -2; x <= 2; x++) {
+              for (let z = -2; z <= 2; z++) {
+                  player.client.writeBatch([{name: 'full_chunk_data', params: {
+                      chunk_x: x,
+                      chunk_z: z,
+                      chunk_data: newChunk
+                  }}]);
+              }
+          }
+          //return;
 
-    client.writeMCPE('respawn', {
-      x: 1,
-      y: 64,
-      z: 1
-    });
-  });
-
-  client.on("request_chunk_radius",(radius) => {
-    client.writeMCPE('chunk_radius_update',{
-      chunk_radius:radius
-    });
-
-    for (let x = -1; x <=1; x++) {
-      for (let z = -1; z <=1; z++) {
-        client.writeBatch([{name:"full_chunk_data",params:{
-          chunkX: x,
-          chunkZ: z,
-          order: 1,
-          chunkData: newChunk
-        }}]);
-      }
-    }
-
-    client.writeMCPE('player_status', {
-      status: 3
-    });
-
-    client.writeMCPE('set_time', {
-      time: 0,
-      started: 1
+          client.writeMCPE('respawn', {
+              x: 0,
+              y: 25,
+              z: 0
+          });
+          client.writeMCPE('player_status', {
+              status: 3
+          });
+      });
     });
 
   });
-
-  client.on('error', function(err) {
-    console.log(err.stack);
-  });
-
-  client.on('end',function() {
-    logger.info("client left");
-  })
-
-});

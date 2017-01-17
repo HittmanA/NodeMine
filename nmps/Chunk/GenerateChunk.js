@@ -1,16 +1,27 @@
 module.exports = {
-  generateChunk: function(x,z) {
+  generateChunk: function() {
     var Chunk = require("prismarine-chunk")("pe_1.0");
-    var Vec3 = require("vec3");
+    var chunk = new Chunk();
+    var Vector3 = require('vec3');
 
-    var chunk=new Chunk();
-    for (var x = x; x < Chunk.w;x++) {
-      for (var z = z; z < Chunk.l; z++) {
-        chunk.setBlockType(new Vec3(x, 50, z), 2);
-        for (var y = 0; y < Chunk.h; y++) {
-          chunk.setSkyLight(new Vec3(x, y, z), 15);
+    var x, y, z;
+    for (x = 0; x < 16; x++) {
+        for (z = 0; z < 16; z++) {
+            //Bedrock layer
+            chunk.setBlockType(new Vector3(x, 0, z), 3);
+            chunk.setSkyLight(new Vector3(x, 0, z), 15);
+            chunk.setBlockType(new Vector3(x, 1, z), 2);
+            chunk.setSkyLight(new Vector3(x, 1, z), 15);
+
+            //Air layer
+            continue;
+            for (y = 2; y < 256; y++) {
+                chunk.setSkyLight(new Vector3(x, y, z), 15);
+                //chunk.setBlockLight(new Vector3(x, y, z), 15);
+                chunk.setBiomeColor(new Vector3(x, y, z), 141, 184, 113);
+            }
         }
-      }
+        
     }
 
     return chunk.dump();
