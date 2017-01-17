@@ -188,6 +188,10 @@ client.on("mcpe",packet => console.log(packet, false));
             });
         });
 
+        player.client.on('text', (packet) => {
+          logger.info(packet);
+        });
+
         player.client.on('request_chunk_radius', (packet) => {
           console.log(packet);
           //if (!player.connected_to_pc) {
