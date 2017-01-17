@@ -11,10 +11,11 @@ var events = require("./nmps/Events/EventEmitter.js");
 var chunk = require("./nmps/Chunk/GenerateChunk.js");
 var commandParser = require("./nmps/Command/CommandParser.js");
 var commandManager = require("./nmps/Command/commandManager.js");
+var Player = require("./nmps/Player/Player.js");
 commandManager = new commandManager();
 commandParser = new commandParser();
 
-var newChunk = chunk.generateChunk();
+//var newChunk = chunk.generateChunk();
 
 logger.info("Starting NMPS...");
 
@@ -35,12 +36,39 @@ var server = pmp.createServer({
 
 logger.info("Server online at "+config.Host+":"+config.Port);
 
+function genLoginWorld (chunkX, chunkZ) {
+    let chunk = new chunk();
+
+    var x, y, z;
+    for (x = 0; x < 16; x++) {
+        for (z = 0; z < 16; z++) {
+            //Bedrock layer
+            chunk.setBlockType(new Vector3(x, 0, z), 3);
+            chunk.setSkyLight(new Vector3(x, 0, z), 15);
+            chunk.setBlockType(new Vector3(x, 1, z), 2);
+            chunk.setSkyLight(new Vector3(x, 1, z), 15);
+
+            //Air layer
+            continue;
+            for (y = 2; y < 256; y++) {
+                chunk.setSkyLight(new Vector3(x, y, z), 15);
+                //chunk.setBlockLight(new Vector3(x, y, z), 15);
+                chunk.setBiomeColor(new Vector3(x, y, z), 141, 184, 113);
+            }
+        }
+    }
+
+    return chunk;
+}
+
 server.on('connection', function(client) {
 
+client.on("mcpe",packet => console.log(packet, false));
 
-  client.on("mcpe",packet => console.log(packet, false));
+  var player = new Player();
+  player.client = client;
 
-  client.on("mcpe_login",packet => {
+  player.client.on("mcpe_login",packet => {
 
     if (packet.protocol !== 100) {
       if (packet.protocol > 100) {
@@ -54,7 +82,7 @@ server.on('connection', function(client) {
         }
     }
 
-    client.writeMCPE("player_status",{
+    player.client.writeMCPE("player_status",{
       status:0
     });
 
@@ -65,12 +93,18 @@ server.on('connection', function(client) {
         });
     }
 
-    client.writeMCPE('resource_packs_info', {
+    player.uuid     = packet.uuid;
+    player.id       = packet.id;
+    player.username = packet.username;
+    player.formatedUsername = player.username;
+
+    player.client.writeMCPE('resource_packs_info', {
             mustAccept: false,
             behahaviorpackinfos: 0,
             resourcepackinfos: 0
         });
-        client.writeMCPE('start_game', {
+
+        player.client.writeMCPE('start_game', {
             entity_id: [0, 0],
             runtime_entity_id: [0, 0],
             x: 0, y: 5 + 1.62, z: 0,
@@ -102,44 +136,90 @@ server.on('connection', function(client) {
             secret: '1m0AAMIFIgA=',
             world_name: 'temp_server'
         });
-        client.writeMCPE('set_time', {
+
+        player.client.writeMCPE('set_time', {
             time: 0,
             started: true
         });
-        client.writeMCPE('adventure_settings', {
+
+        player.client.writeMCPE('adventure_settings', {
             flags: 0x040,
             user_permission: 3
         });
-        client.writeMCPE('player_status', {
+
+        player.client.writeMCPE('player_status', {
             status: 3
         });
-        client.on('request_chunk_radius', (packet) => {
+
+        player.pos.x = 0;
+
+          player.client.writeMCPE('respawn', {
+              x: 0,
+              y: 25,
+              z: 0
+          });
+
+          player.client.writeMCPE('player_status', {
+              status: 3
+          });
+
+          player.client.on('move_player', (packet) => {
+            console.log(packet);
+            if (!player.pos.x || player.pos.x === 0)
+                return;
+
+            player.pos.x = packet.x;
+            player.pos.y = packet.y;
+            player.pos.z = packet.z;
+
+            player.yaw = packet.yaw;
+            player.head_yaw = packet.head_yaw;
+            player.pitch = packet.pitch;
+
+            player.client_pc.write('position_look', {
+                x: player.pos.x,
+                y: player.pos.y - 1.62,
+                z: player.pos.z,
+
+                yaw: player.yaw,
+                pitch: player.pitch,
+                flags: 0x00,
+                teleportId: player.teleportId,
+            });
+        });
+
+        player.client.on('request_chunk_radius', (packet) => {
           console.log(packet);
-          client.writeMCPE('chunk_radius_update', {
+          //if (!player.connected_to_pc) {
+              //sconsole.log(packet);
+
+          //Generate login world
+          player.client.writeMCPE('chunk_radius_update', {
               chunk_radius: 22
           });
           return;
 
           for (let x = -2; x <= 2; x++) {
               for (let z = -2; z <= 2; z++) {
+                  let chunk = genLoginWorld(x, z);
                   player.client.writeBatch([{name: 'full_chunk_data', params: {
                       chunk_x: x,
                       chunk_z: z,
-                      chunk_data: newChunk
+                      chunk_data: chunk.dump()
                   }}]);
               }
           }
           //return;
 
-          client.writeMCPE('respawn', {
+          player.client.writeMCPE('respawn', {
               x: 0,
               y: 25,
               z: 0
           });
-          client.writeMCPE('player_status', {
+          player.client.writeMCPE('player_status', {
               status: 3
           });
+        });
+
       });
     });
-
-  });
