@@ -16,6 +16,9 @@ commandManager = new commandManager();
 commandParser = new commandParser();
 var loader = require("./nmps/Command/CommandsLoader.js");
 loader = new loader();
+logger.warn("Hello");
+logger.critical("Aghhh");
+logger.error("ERROR","wow");
 
 //var newChunk = chunk.generateChunk();
 
@@ -194,11 +197,11 @@ client.on("mcpe",packet => console.log(packet, false));
           logger.info(packet);
         });
 
-        events.on("SEND_MESSAGE", function(sender, message){
+        events.on("SEND_MESSAGE", function(data){
           player.client.writeMCPE('text', {
             type: 1,
-            source: sender+" "+message,
-            message: message
+            source: data,
+            message: ""
           });
         });
 
