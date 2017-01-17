@@ -1,6 +1,7 @@
 'use strict';
 
 var pmp = require('pocket-minecraft-protocol');
+var Vector3 = require("vec3");
 var fs = require("fs");
 var processConfig =  require("./nmps/Config/processConfig.js");
 var logger = require("./nmps/Console/Console.js");
@@ -8,7 +9,7 @@ var gfs = require("./nmps/Utils/GetFileSync.js");
 var io = require("./nmps/Console/IO.js");
 var Io = new io();
 var events = require("./nmps/Events/EventEmitter.js");
-var chunk = require("./nmps/Chunk/GenerateChunk.js");
+var PrisChunk = require('prismarine-chunk')('pe_1.0');
 var commandParser = require("./nmps/Command/CommandParser.js");
 var commandManager = require("./nmps/Command/commandManager.js");
 var Player = require("./nmps/Player/Player.js");
@@ -42,7 +43,7 @@ var server = pmp.createServer({
 logger.info("Server online at "+config.Host+":"+config.Port);
 
 function genLoginWorld (chunkX, chunkZ) {
-    let chunk = new chunk();
+    let chunk = new PrisChunk();
 
     var x, y, z;
     for (x = 0; x < 16; x++) {
@@ -112,7 +113,7 @@ client.on("mcpe",packet => console.log(packet, false));
         player.client.writeMCPE('start_game', {
             entity_id: [0, 0],
             runtime_entity_id: [0, 0],
-            x: 0, y: 5 + 1.62, z: 0,
+            x: 0, y: 10 + 1.62, z: 0,
             unknown_1: {
                 x: 15,
                 y: 25
@@ -125,7 +126,7 @@ client.on("mcpe",packet => console.log(packet, false));
 
             spawn: {
                 x: 0,
-                y: 5 + 1.62,
+                y: 10 + 1.62,
                 z: 0
             },
 
@@ -214,11 +215,10 @@ client.on("mcpe",packet => console.log(packet, false));
           player.client.writeMCPE('chunk_radius_update', {
               chunk_radius: 22
           });
-          return;
 
           for (let x = -2; x <= 2; x++) {
               for (let z = -2; z <= 2; z++) {
-                  let chunk = genLoginWorld(x, z);
+                  var chunk = genLoginWorld(x, z);
                   player.client.writeBatch([{name: 'full_chunk_data', params: {
                       chunk_x: x,
                       chunk_z: z,
@@ -227,13 +227,13 @@ client.on("mcpe",packet => console.log(packet, false));
               }
           }
           //return;
-          /*
+
           player.client.writeMCPE('respawn', {
               x: 0,
               y: 25,
               z: 0
           });
-          */
+
           player.client.writeMCPE('player_status', {
               status: 3
           });
