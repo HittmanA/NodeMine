@@ -4,7 +4,8 @@ module.exports = function() {
     if(data[0] == "/") {
       data = data.replace("/","").trim();
       data = data.split(" ");
-      events.emit("COMMAND", data);
+      command = data.shift();
+      events.emit("COMMAND", command, data);
     }else{
       //Send to chat
     }

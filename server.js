@@ -14,6 +14,8 @@ var commandManager = require("./nmps/Command/commandManager.js");
 var Player = require("./nmps/Player/Player.js");
 commandManager = new commandManager();
 commandParser = new commandParser();
+var loader = require("./nmps/Command/CommandsLoader.js");
+loader = new loader();
 
 //var newChunk = chunk.generateChunk();
 
@@ -93,8 +95,8 @@ client.on("mcpe",packet => console.log(packet, false));
         });
     }
 
-    player.uuid     = packet.uuid;
-    player.id       = packet.id;
+    player.uuid = packet.uuid;
+    player.id = packet.id;
     player.username = packet.username;
     player.formatedUsername = player.username;
 
@@ -214,12 +216,13 @@ client.on("mcpe",packet => console.log(packet, false));
               }
           }
           //return;
-
+          /*
           player.client.writeMCPE('respawn', {
               x: 0,
               y: 25,
               z: 0
           });
+          */
           player.client.writeMCPE('player_status', {
               status: 3
           });
