@@ -194,6 +194,14 @@ client.on("mcpe",packet => console.log(packet, false));
           logger.info(packet);
         });
 
+        events.on("SEND_MESSAGE", function(sender, message){
+          player.client.writeMCPE('text', {
+            type: 1,
+            source: sender+message,
+            message: message
+          });
+        });
+
         player.client.on('request_chunk_radius', (packet) => {
           console.log(packet);
           //if (!player.connected_to_pc) {
