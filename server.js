@@ -197,7 +197,7 @@ client.on("mcpe",packet => console.log(packet, false));
         events.on("SEND_MESSAGE", function(sender, message){
           player.client.writeMCPE('text', {
             type: 1,
-            source: sender+message,
+            source: sender+" "+message,
             message: message
           });
         });
